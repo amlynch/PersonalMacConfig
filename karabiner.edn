@@ -1,0 +1,234 @@
+{
+    ;; !  | means mandatory -   modifier(s) alone when pressend change behavior
+    ;; #  | means optional  -   modifiers are optional (but atleast one necessary)
+    ;; :!Ca is keycode :a and prefix a with !C
+
+    ;; C  | left_command
+    ;; T  | left_control
+    ;; O  | left_option
+    ;; S  | left_shift
+    ;; F  | fn
+    ;; Q  | right_command
+    ;; W  | right_control
+    ;; E  | right_option
+    ;; R  | right_shift
+
+    ;; ## | optional any
+    ;; !! | command + control + optional + shift (hyper)
+
+    ;; to understand better how modifiers work in karabiner
+    ;; karabiner definition of mandatory and optional
+    ;; https://karabiner-elements.pqrs.org/docs/json/complex-modifications-manipulator-definition/from/modifiers/
+
+    ;; need to prefix C T O S F with ! or #
+    ;;
+    ;; code for all this:
+    ;; https://github.com/yqrashawn/GokuRakuJoudo/blob/b9b334a187379f9bc8182ad59e2cca2a1789e9c0/src/karabiner_configurator/keys.clj#L68
+
+
+:profiles {
+    :Default {  :default true
+                :sim     50    ;; simultaneous_threshold_milliseconds (def: 50)
+                                ;; keys need to be pressed within this threshold to be considered simultaneous
+                :delay   500    ;; to_delayed_action_delay_milliseconds (def: 500)
+                                ;; basically it means time after which the key press is count delayed
+                :alone   500    ;; to_if_alone_timeout_milliseconds (def: 1000)
+                                ;; hold for 995s and single tap registered; hold for 1005s and seen as modifier
+                :held    1000   ;; to_if_held_down_threshold_milliseconds (def: 500)
+                                ;; key is fired twice when 500 ms is elapsed (otherwise seen as a hold command)
+             }
+} ;; profiles
+
+;; layers are basically "hyper" keys
+;; press this in combination with something else and depending on your rule, make things happen
+:layers {
+} ;; layers
+
+;; simlayers are basically "hyper" keys
+;; layers works too, but only recommended for non-typing keys like . or tab
+;; or keys like z which are used less often
+:simlayers {
+ :tabmode {:key :tab}
+ :func {:key :fn}
+ :escmode {:key :escape}
+} ;; simlayers
+
+:devices {
+    :Dell [{:vendor_id 16700, :product_id 8465 }] ;;Dell wired keyboard at desk
+} ;; devices
+
+:applications {
+    :Firefox [
+        "^org\\.mozilla\\.firefox"
+    ]
+    :Mail [
+        "^com\\.apple\\.mail"
+    ]
+    :Terminal [
+        "^com\\.apple\\.Terminal$"
+    ]
+    :Finder [
+        "^com\\.apple\\.finder$"
+    ]
+    :CotEditor [
+        "^com\\.coteditor\\.CotEditor"
+    ]
+}
+
+;; main contains multiple manipulators
+:main [
+
+    ;; each manipulator has a description and multiple rules
+
+    ;;{:des "..."                               ;; -> description
+    ;; :rules[
+    ;;          [<from>  <to>  <conditions>]    ;; -> rule 1
+    ;;          [<from>  <to>  <conditions>]    ;; -> rule 2
+    ;; ]}
+
+    ;; rule [:period ["period-mode" 1] nil {:afterup ["period-mode" 0] :alone :period}]
+    ;;       |_____| |_______________| |_| |_________________________________________|
+    ;;        <from>    <to>      <conditions>         <other options>
+    ;;
+    ;; karabiner docs: ;; https://pqrs.org/osx/karabiner/json.html#complex_modifications-manipulator-definition
+    ;; <other options> includs ~to_if_alone~, ~to_if_held_down~,~to_after_key_up~, ~to_delayed_action~ and ~parameters~.
+    ;;
+
+    ;; (custom variables) & modifiers -> Advanced
+    ;; https://github.com/yqrashawn/GokuRakuJoudo/blob/master/examples.org#custom-variable
+    {:des "Simple Remaps"
+    :rules [
+        [:eject :escape]
+        [:caps_lock :delete_forward nil {:!Scaps_lock :caps_lock}]
+        [:!Sf1 :f13]
+        [:!Sf1 :f13]
+        [:!Sf2 :f14]
+        [:!Sf3 :f15]
+        [:!Sf4 :f16]
+        [:!Sf5 :f17]
+        [:!Sf6 :f18]
+        [:!Sf7 :f19]
+        [:!Sf8 :f20]
+        [:!Sf9 :f20]
+    ]
+    }
+
+;;    {:des "Function Commands"
+;;    :rules [
+;;        :func
+;; ]
+;;   }
+
+    {:des "Shift -> {} or Shift"
+     :rules [
+       [:##left_shift :left_shift nil  {:alone :!Sopen_bracket} ]
+       [:##right_shift :right_shift  nil {:alone :!Sclose_bracket} ]
+    ]}
+
+    {:des "Tab JKLI Arrows"
+    :rules [
+        :tabmode
+            [:j :left_arrow]
+            [:k :down_arrow]
+            [:l :right_arrow]
+            [:i :up_arrow]
+        ]
+    }
+
+    {:des "Mail Shortcuts"
+    :rules[
+        :Mail
+            [:!STequal_sign :!SCt] ;;Label w/ ToDo Flag
+            [:!ST1 :!SCg] ;;Move to Gmail To Do
+            [:!ST2 :!SCu] ;;Move to UM to do
+            [:!ST3 :!SCw] ;;Move to WMed processed
+            [:!ST4 :!SCk] ;;Move to KVCC processed
+    ]
+    }
+
+    {:des "Dell Keyboard Changes"
+    :rules[
+        :Dell
+            [:left_command :left_option]
+            [:left_option :left_command]
+            ;; right command and application key done in karabiner directly, wasn't working in goku
+            [:keypad_1 :1]
+            [:keypad_2 :2]
+            [:keypad_3 :3]
+            [:keypad_4 :4]
+            [:keypad_5 :5]
+            [:keypad_6 :6]
+            [:keypad_7 :7]
+            [:keypad_8 :8]
+            [:keypad_9 :9]
+            [:keypad_0 :0]
+            [:keypad_enter :return_or_enter]
+            ;; did this in karabiner instead [:keypad_slash :slash]
+           ;; [:keypad_asterisk :asterisk]
+             ;; did this in karabiner instead  [:keypad_hyphen :hyphen]
+            ;;[:keypad_plus :plus]
+            ;;[:keypad_period :period]
+        [:!Wf1 :f1]
+        [:!Wf2 :f2]
+        [:!Wf3 :f3]
+        [:!Wf4 :f4]
+        [:!Wf5 :f5]
+        [:!Wf6 :f6]
+        [:!Wf7 :f7]
+        [:!Wf8 :f8]
+        [:!Wf9 :f9]
+        [:!Wf10 :f10]
+        [:!Wf11 :f11]
+        [:!Wf12 :f12]
+        [:print_screen :fn] ;;allows special action usage on dell
+;;        ["keypad_num_lock" 1]
+        ;;[:delete_forward :keypad_num_lock]
+
+        ]
+    }
+
+;;    {:des "Enable Num Lock Toggle"
+;;    :rules[
+;;        :locking_num_lock
+;;        :keypad_num_lock
+;;        ]
+;;    }
+    {:des "Numeric Keypad Trigger (Escape as Trigger)"
+    :rules[
+        :escmode
+            [:m :1]
+            [:comma :2]
+            [:period :3]
+            [:j :4]
+            [:k :5]
+            [:l :6]
+            [:u :7]
+            [:i :8]
+            [:o :9]
+            [:spacebar :0]
+    ]
+    }
+
+    {:des   "Quit application by pressing command-q twice"
+              :rules
+                [[:!C#Pq [:!Cq ["command-q" 0]] ["command-q" 1]]
+                [:!C#Pq ["command-q" 1] nil {:delayed {:invoked ["command-q" 0] :canceled ["command-q" 0]}}]]
+    }
+
+    {:des "Use Right_Cmd+h/l to switch tabs in app"
+    :rules[
+        [:!Ql :!Ttab]
+        [:!Qh :!TStab]
+        ]
+    }
+
+    {:des "Use right_cmd + j/k to switch windows of foreground app"
+        :rules[
+            [:!Qk :!Cgrave_accent_and_tilde] ;;right command k to left command grave-accent-and-tilde
+            [:!Qj :!CSgrave_accent_and_tilde] ;;right command j to left command left shirft grave-accent-and-tilde
+        ]
+    }
+
+] ;; main list
+
+};;end file
